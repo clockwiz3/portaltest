@@ -67,11 +67,6 @@
             }, 5000);
         }
 
-        Echo.channel('users')
-            .listen('NewUserRegistered', (event) => {
-                createNotification(`${event.user.name} зарегистрирован.`);
-            });
-
         document.getElementById('fetch-news').addEventListener('click', function () {
             fetch('{{ route('news.fetch') }}', {
                 method: 'POST',
