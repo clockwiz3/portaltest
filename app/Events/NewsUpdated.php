@@ -10,16 +10,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewsUpdated
+class NewsUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $user;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($user)
     {
-        //
+        $this->user = $user;
     }
 
     /**
@@ -27,10 +29,16 @@ class NewsUpdated
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): Channel
+    {
+        return new Channel('users');
+    }
+
+    public function broadcastWith()
     {
         return [
-            new PrivateChannel('channel-name'),
+            'id' => $this->user->id,
+            'name' => $this->user->name,
         ];
     }
 }

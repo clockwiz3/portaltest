@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\News;
 use Illuminate\Support\Facades\Artisan;
-use App\Events\NewsSearched;
 use App\Events\NewsUpdated;
 
 class DashboardController extends Controller
@@ -21,7 +20,8 @@ class DashboardController extends Controller
     {
         Artisan::call('fetch:news');
 
-        event(new NewsUpdated());
+        NewsUpdated::dispatch($request->user());
+
         return response()->json(['message' => 'Новости обновлены']);
     }
 

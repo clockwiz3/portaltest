@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         function createNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -67,6 +67,28 @@
             }, 5000);
         }
 
+        const currentUserId = {{ auth()->user()->id }};
+
+        function handleEventNotification(event, message) {
+            if (event.id === currentUserId) {
+                return;
+            }
+
+            createNotification(message);
+        }
+
+        Echo.channel('users')
+            .listen('NewUserRegistered', (event) => {
+                handleEventNotification(event, `${event.name} зарегистрирован`);
+            })
+            .listen('UserLoggedIn', (event) => {
+                handleEventNotification(event, `${event.name} вошел`);
+            })
+            .listen('NewsUpdated', (event) => {
+                handleEventNotification(event, `${event.name} обновил вам ленту`);
+                fetchLatestNews();
+            });
+
         document.getElementById('fetch-news').addEventListener('click', function () {
             fetch('{{ route('news.fetch') }}', {
                 method: 'POST',
@@ -77,7 +99,7 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    alert(data.message);
+                    createNotification(data.message);
                     fetchLatestNews();
                 })
                 .catch(error => {
